@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>TechFix · Turnero</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:       #f5f4f0;
+  --surface:  #ffffff;
+  --card:     #fafaf8;
+  --border:   #e8e6e0;
+  --border2:  #d4d0c8;
+  --ink:      #1a1916;
+  --ink2:     #6b6860;
+  --ink3:     #a8a49c;
+  --orange:   #ff5c00;
+  --orange-l: #fff2ec;
+  --green:    #00a86b;
+  --green-l:  #ebfbf4;
+  --red:      #e02020;
+  --red-l:    #fdeaea;
+  --blue:     #1a6bff;
+  --blue-l:   #eef3ff;
+  --yellow:   #f5a300;
+  --yellow-l: #fffbec;
+  --display:  'Syne', sans-serif;
+  --body:     'DM Sans', sans-serif;
+  --radius:   10px;
+  --shadow:   0 2px 12px rgba(0,0,0,.07);
+  --shadow2:  0 8px 32px rgba(0,0,0,.10);
+}
+
+html,body{height:100%;font-family:var(--body);background:var(--bg);color:var(--ink);font-size:14px}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-rows:64px 1fr;height:100vh;overflow:hidden}
+
+/* ── HEADER ── */
+header{
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  box-shadow:0 1px 0 rgba(255,255,255,.08);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:var(--orange);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.brand-name{font-family:var(--display);font-size:18px;font-weight:800;color:#fff;letter-spacing:-.01em}
+.brand-sub{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+
+.header-stats{display:flex;gap:20px}
+.hstat{text-align:right}
+.hstat-val{font-family:var(--display);font-size:22px;font-weight:700;line-height:1}
+.hstat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;opacity:.45;margin-top:2px}
+.hstat.espera .hstat-val{color:var(--yellow)}
+.hstat.atendidos .hstat-val{color:var(--green)}
+
+/* ── BODY GRID ── */
+.body{display:grid;grid-template-columns:380px 1fr;overflow:hidden;height:100%}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+}
+
+.sb-block{padding:22px 24px;border-bottom:1px solid var(--border)}
+.sb-block:last-child{border-bottom:none;flex:1}
+
+.sb-title{
+  font-family:var(--display);font-size:11px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);
+  margin-bottom:16px;
+}
+
+/* ── Input nombre ── */
+.inp-wrap{position:relative;margin-bottom:14px}
+.inp-wrap input{
+  width:100%;padding:12px 14px;
+  background:var(--card);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  font-family:var(--body);font-size:14px;color:var(--ink);
+  outline:none;transition:border-color .15s, box-shadow .15s;
+}
+.inp-wrap input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,92,0,.12)}
+.inp-wrap input::placeholder{color:var(--ink3)}
+
+.inp-wrap .inp-icon{
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:16px;opacity:.3;
+}
+
+/* ── Tipos de servicio ── */
+.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.svc-btn{
+  padding:11px 10px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--card);
+  cursor:pointer;
+  text-align:left;
+  transition:all .15s;
+  display:flex;flex-direction:column;gap:3px;
+}
+.svc-btn:hover{border-color:var(--border2);background:#fff;box-shadow:var(--shadow)}
+.svc-btn.active{
+  border-color:var(--orange);
+  background:var(--orange-l);
+  box-shadow:0 0 0 3px rgba(255,92,0,.1);
+}
+.svc-icon{font-size:18px;line-height:1}
+.svc-name{font-family:var(--display);font-size:12px;font-weight:700;color:var(--ink)}
+.svc-desc{font-size:10px;color:var(--ink2);line-height:1.3}
+
+/* ── Urgencia ── */
+.urg-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:16px}
+.urg-btn{
+  padding:9px 6px;text-align:center;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--card);
+  cursor:pointer;transition:all .15s;
+}
+.urg-btn:hover{background:#fff;border-color:var(--border2)}
+.urg-icon{font-size:16px;line-height:1}
+.urg-lbl{font-size:10px;font-weight:600;color:var(--ink2);margin-top:3px;text-transform:uppercase;letter-spacing:.04em}
+.urg-btn.active-1{border-color:var(--red);background:var(--red-l)}
+.urg-btn.active-1 .urg-lbl{color:var(--red)}
+.urg-btn.active-2{border-color:var(--yellow);background:var(--yellow-l)}
+.urg-btn.active-2 .urg-lbl{color:var(--yellow)}
+.urg-btn.active-3{border-color:var(--green);background:var(--green-l)}
+.urg-btn.active-3 .urg-lbl{color:var(--green)}
+
+/* ── Botón registrar ── */
+.btn-register{
+  width:100%;padding:14px;
+  background:var(--orange);color:#fff;
+  border:none;border-radius:var(--radius);
+  font-family:var(--display);font-size:13px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-register:hover{background:#e54f00;box-shadow:0 4px 16px rgba(255,92,0,.35)}
+.btn-register:active{transform:scale(.98)}
+
+/* ── Estrategias ── */
+.strat-list{display:flex;flex-direction:column;gap:6px}
+.strat-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  background:var(--card);cursor:pointer;
+  transition:all .15s;
+}
+.strat-btn:hover{background:#fff;border-color:var(--border2);box-shadow:var(--shadow)}
+.strat-btn.active{border-color:var(--orange);background:var(--orange-l)}
+.strat-ico{font-size:18px;width:32px;text-align:center}
+.strat-info{flex:1}
+.strat-name{font-family:var(--display);font-size:12px;font-weight:700;color:var(--ink)}
+.strat-desc{font-size:11px;color:var(--ink2);margin-top:1px}
+.strat-tag{
+  font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+  padding:2px 7px;border-radius:20px;
+  background:var(--orange);color:#fff;
+  opacity:0;transition:opacity .15s;
+}
+.strat-btn.active .strat-tag{opacity:1}
+
+/* ── MAIN PANEL ── */
+.main-panel{display:grid;grid-template-rows:1fr 1fr;overflow:hidden}
+
+/* ── Panel de cola ── */
+.queue-panel{
+  display:flex;flex-direction:column;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+  background:var(--bg);
+}
+
+.panel-head{
+  padding:16px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.panel-head-left{display:flex;align-items:center;gap:14px}
+.panel-num{
+  font-family:var(--display);font-size:36px;font-weight:800;line-height:1;
+  color:var(--orange);
+}
+.panel-label{font-family:var(--display);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.panel-sub{font-size:11px;color:var(--ink2);margin-top:2px}
+
+.btn-attend{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 22px;
+  background:var(--ink);color:#fff;
+  border:none;border-radius:var(--radius);
+  font-family:var(--display);font-size:12px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;
+  cursor:pointer;transition:all .18s;
+}
+.btn-attend:hover{background:var(--orange);box-shadow:0 4px 18px rgba(255,92,0,.3)}
+.btn-attend:active{transform:scale(.97)}
+
+.panel-body{overflow-y:auto;flex:1;padding:12px}
+
+/* ── Cards de turno ── */
+.turn-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  margin-bottom:8px;
+  display:grid;
+  grid-template-columns:48px 1fr auto auto;
+  align-items:center;gap:12px;
+  transition:all .15s;
+  animation:cardIn .25s ease;
+}
+.turn-card:hover{border-color:var(--border2);box-shadow:var(--shadow)}
+@keyframes cardIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+
+.card-num{
+  font-family:var(--display);font-size:20px;font-weight:800;color:var(--orange);
+  text-align:center;line-height:1;
+}
+.card-num-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);text-align:center;margin-top:1px}
+
+.card-info{}
+.card-name{font-family:var(--display);font-size:14px;font-weight:700;color:var(--ink)}
+.card-meta{display:flex;align-items:center;gap:6px;margin-top:4px;flex-wrap:wrap}
+
+.tag{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:20px;
+  font-size:10px;font-weight:600;letter-spacing:.03em;
+}
+.tag-svc{background:var(--blue-l);color:var(--blue)}
+.tag-urg-1{background:var(--red-l);color:var(--red)}
+.tag-urg-2{background:var(--yellow-l);color:var(--yellow)}
+.tag-urg-3{background:var(--green-l);color:var(--green)}
+
+.card-hora{font-size:11px;color:var(--ink3);white-space:nowrap}
+
+.btn-x{
+  background:none;border:1.5px solid var(--border);
+  color:var(--ink3);width:30px;height:30px;
+  border-radius:6px;cursor:pointer;font-size:14px;
+  transition:all .15s;display:flex;align-items:center;justify-content:center;
+}
+.btn-x:hover{border-color:var(--red);color:var(--red);background:var(--red-l)}
+
+/* ── Estado vacío ── */
+.empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  height:100%;gap:10px;padding:40px;
+}
+.empty-emoji{font-size:40px;opacity:.2}
+.empty-txt{font-family:var(--display);font-size:13px;font-weight:600;color:var(--ink3)}
+
+/* ── Historial panel ── */
+.hist-panel{
+  display:flex;flex-direction:column;
+  background:var(--bg);overflow:hidden;
+}
+.hist-body{overflow-y:auto;flex:1;padding:12px}
+
+.hist-card{
+  background:var(--surface);
+  border:1.5px solid var(--border);
+  border-radius:var(--radius);
+  padding:12px 16px;margin-bottom:6px;
+  display:grid;grid-template-columns:48px 1fr auto;
+  align-items:center;gap:12px;
+  opacity:.75;
+  animation:cardIn .2s ease;
+}
+.hist-card .card-num{color:var(--green);font-size:16px}
+.hist-done{
+  display:flex;flex-direction:column;align-items:flex-end;gap:2px;
+}
+.hist-done-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--green-l);color:var(--green);
+  font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:20px;
+}
+.hist-time{font-size:10px;color:var(--ink3)}
+
+/* ── Toast ── */
+.toasts{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:999;pointer-events:none}
+.toast{
+  background:var(--ink);color:#fff;
+  padding:10px 20px;border-radius:30px;
+  font-family:var(--display);font-size:13px;font-weight:600;
+  white-space:nowrap;
+  animation:toastIn .2s ease, toastOut .3s ease 2.4s forwards;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);
+}
+.toast.ok::before{content:"✓  "}
+.toast.warn{background:var(--yellow);color:var(--ink)}
+.toast.warn::before{content:"⚠  "}
+.toast.err{background:var(--red)}
+.toast.err::before{content:"✕  "}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes toastOut{to{opacity:0;transform:translateY(-8px)}}
+
+/* ── Responsive ── */
+@media(max-width:780px){
+  .body{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .sidebar{max-height:50vh}
+  .service-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="brand">
+    <div class="brand-icon">📱</div>
+    <div>
+      <div class="brand-name">TechFix</div>
+      <div class="brand-sub">Sistema de Turnos</div>
+    </div>
+  </div>
+  <div class="header-stats">
+    <div class="hstat espera">
+      <div class="hstat-val" id="h-espera">0</div>
+      <div class="hstat-lbl">En espera</div>
+    </div>
+    <div class="hstat atendidos">
+      <div class="hstat-val" id="h-atendidos">0</div>
+      <div class="hstat-lbl">Atendidos hoy</div>
+    </div>
+  </div>
+</header>
+
+<!-- ══ BODY ══ -->
+<div class="body">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+
+    <!-- Nuevo turno -->
+    <div class="sb-block">
+      <div class="sb-title">Nuevo turno</div>
+
+      <div class="inp-wrap">
+        <input id="inp-nombre" type="text" placeholder="Nombre del cliente" autocomplete="off"/>
+        <span class="inp-icon">👤</span>
+      </div>
+
+      <!-- Tipo de servicio -->
+      <div class="sb-title" style="margin-bottom:10px">Tipo de servicio</div>
+      <div class="service-grid" id="svc-grid">
+        <button class="svc-btn active" data-svc="Pantalla">
+          <span class="svc-icon">🖥️</span>
+          <span class="svc-name">Pantalla</span>
+          <span class="svc-desc">Rotura, táctil</span>
+        </button>
+        <button class="svc-btn" data-svc="Batería">
+          <span class="svc-icon">🔋</span>
+          <span class="svc-name">Batería</span>
+          <span class="svc-desc">Cambio, hinchada</span>
+        </button>
+        <button class="svc-btn" data-svc="Software">
+          <span class="svc-icon">⚙️</span>
+          <span class="svc-name">Software</span>
+          <span class="svc-desc">Sistema, apps</span>
+        </button>
+        <button class="svc-btn" data-svc="Cámara">
+          <span class="svc-icon">📷</span>
+          <span class="svc-name">Cámara</span>
+          <span class="svc-desc">Lente, imagen</span>
+        </button>
+        <button class="svc-btn" data-svc="Carga">
+          <span class="svc-icon">🔌</span>
+          <span class="svc-name">Carga</span>
+          <span class="svc-desc">Puerto, cable</span>
+        </button>
+        <button class="svc-btn" data-svc="Otro">
+          <span class="svc-icon">🔧</span>
+          <span class="svc-name">Otro</span>
+          <span class="svc-desc">Consultar</span>
+        </button>
+      </div>
+
+      <!-- Urgencia -->
+      <div class="sb-title" style="margin-bottom:10px">Urgencia</div>
+      <div class="urg-row">
+        <button class="urg-btn" data-urg="1">
+          <div class="urg-icon">🔴</div>
+          <div class="urg-lbl">Urgente</div>
+        </button>
+        <button class="urg-btn active-2" data-urg="2">
+          <div class="urg-icon">🟡</div>
+          <div class="urg-lbl">Normal</div>
+        </button>
+        <button class="urg-btn" data-urg="3">
+          <div class="urg-icon">🟢</div>
+          <div class="urg-lbl">Sin apuro</div>
+        </button>
+      </div>
+
+      <button class="btn-register" onclick="accion.nuevoTurno()">
+        <span>+</span> Registrar turno
+      </button>
+    </div>
+
+    <!-- Estrategias -->
+    <div class="sb-block">
+      <div class="sb-title">Modo de atención</div>
+      <div class="strat-list">
+        <button class="strat-btn active" data-strat="fifo" onclick="accion.cambiarEstrategia('fifo')">
+          <span class="strat-ico">→</span>
+          <div class="strat-info">
+            <div class="strat-name">Por orden de llegada</div>
+            <div class="strat-desc">Primero en llegar, primero atendido</div>
+          </div>
+          <span class="strat-tag">ACTIVO</span>
+        </button>
+        <button class="strat-btn" data-strat="prioridad" onclick="accion.cambiarEstrategia('prioridad')">
+          <span class="strat-ico">🔴</span>
+          <div class="strat-info">
+            <div class="strat-name">Por urgencia</div>
+            <div class="strat-desc">Urgentes primero</div>
+          </div>
+          <span class="strat-tag">ACTIVO</span>
+        </button>
+        <button class="strat-btn" data-strat="categoria" onclick="accion.cambiarEstrategia('categoria')">
+          <span class="strat-ico">🖥️</span>
+          <div class="strat-info">
+            <div class="strat-name">Por tipo de servicio</div>
+            <div class="strat-desc">Pantalla → Batería → …</div>
+          </div>
+          <span class="strat-tag">ACTIVO</span>
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ── MAIN PANEL ── -->
+  <div class="main-panel">
+
+    <!-- Cola en espera -->
+    <div class="queue-panel">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-num" id="count-espera">0</div>
+          <div>
+            <div class="panel-label">En espera</div>
+            <div class="panel-sub" id="strat-label">Modo: Por orden de llegada</div>
+          </div>
+        </div>
+        <button class="btn-attend" onclick="accion.atenderSiguiente()">
+          ▶ &nbsp;Llamar siguiente
+        </button>
+      </div>
+      <div class="panel-body" id="queue-body">
+        <div class="empty" id="empty-queue">
+          <div class="empty-emoji">📭</div>
+          <div class="empty-txt">Sin turnos en espera</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial -->
+    <div class="hist-panel">
+      <div class="panel-head">
+        <div class="panel-head-left">
+          <div class="panel-num" style="color:var(--green)" id="count-atend">0</div>
+          <div>
+            <div class="panel-label">Atendidos hoy</div>
+            <div class="panel-sub">Historial de la jornada</div>
+          </div>
+        </div>
+      </div>
+      <div class="hist-body" id="hist-body">
+        <div class="empty" id="empty-hist">
+          <div class="empty-emoji">✅</div>
+          <div class="empty-txt">Aún no se atendió ningún turno</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-panel -->
+
+</div><!-- /body -->
+</div><!-- /app -->
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ══════════════════════════════════════════════
+//  MODELO — lógica de negocio (patron MVC)
+// ══════════════════════════════════════════════
+
+class EstrategiaAtencion {
+  seleccionarSiguiente(t){ throw new Error("Implementar") }
+  nombre(){ throw new Error("Implementar") }
+}
+
+// Strategy 1: FIFO
+class EstrategiaFIFO extends EstrategiaAtencion {
+  seleccionarSiguiente(t){ return t[0] ?? null }
+  nombre(){ return "Por orden de llegada" }
+}
+
+// Strategy 2: Urgencia (prioridad numérica: 1=urgente)
+class EstrategiaUrgencia extends EstrategiaAtencion {
+  seleccionarSiguiente(t){
+    if(!t.length) return null
+    return t.reduce((m,x)=>
+      x.urgencia < m.urgencia ||(x.urgencia===m.urgencia && x.numero<m.numero)?x:m
+    )
+  }
+  nombre(){ return "Por urgencia" }
+}
+
+// Strategy 3: tipo de servicio (Pantalla primero, etc.)
+class EstrategiaServicio extends EstrategiaAtencion {
+  static ORDEN = ["Pantalla","Batería","Carga","Cámara","Software","Otro"]
+  seleccionarSiguiente(t){
+    if(!t.length) return null
+    for(const s of EstrategiaServicio.ORDEN){
+      const f = t.find(x=>x.servicio===s)
+      if(f) return f
+    }
+    return t[0]
+  }
+  nombre(){ return "Por tipo de servicio" }
+}
+
+// Singleton
+class ColaTurnos {
+  static #inst = null
+  constructor(){
+    if(ColaTurnos.#inst) return ColaTurnos.#inst
+    this._espera=[]; this._atendidos=[]; this._cnt=0
+    this._strat = new EstrategiaFIFO()
+    ColaTurnos.#inst = this
+  }
+  static getInstance(){ return ColaTurnos.#inst ?? new ColaTurnos() }
+
+  cambiarEstrategia(s){
+    if(!(s instanceof EstrategiaAtencion)) throw new TypeError("Estrategia inválida")
+    this._strat = s
+  }
+  estrategiaActual(){ return this._strat.nombre() }
+
+  agregarTurno(nombre, servicio, urgencia){
+    if(!nombre?.trim()) throw new Error("El nombre no puede estar vacío.")
+    if(![1,2,3].includes(+urgencia)) throw new Error("Urgencia inválida.")
+    const hora = new Date().toTimeString().slice(0,5)
+    const turno = {
+      numero: ++this._cnt,
+      nombre: nombre.trim(),
+      servicio,
+      urgencia: +urgencia,
+      hora,
+      estado: "esperando"
+    }
+    this._espera.push(turno)
+    return turno
+  }
+
+  atenderSiguiente(){
+    const t = this._strat.seleccionarSiguiente(this._espera)
+    if(!t) return null
+    this._espera = this._espera.filter(x=>x!==t)
+    t.estado = "atendido"
+    t.horaAtencion = new Date().toTimeString().slice(0,5)
+    this._atendidos.unshift(t)
+    return t
+  }
+
+  cancelarTurno(n){
+    const i = this._espera.findIndex(x=>x.numero===+n)
+    if(i===-1) return false
+    this._espera.splice(i,1); return true
+  }
+
+  turnosEnEspera(){ return [...this._espera] }
+  turnosAtendidos(){ return [...this._atendidos] }
+  cantidadEnEspera(){ return this._espera.length }
+  totalAtendidos(){ return this._atendidos.length }
+}
+
+// ══════════════════════════════════════════════
+//  ESTADO UI
+// ══════════════════════════════════════════════
+
+const cola = ColaTurnos.getInstance()
+let selSvc = "Pantalla"
+let selUrg = 2
+
+// Servicios
+document.getElementById("svc-grid").addEventListener("click", e=>{
+  const btn = e.target.closest(".svc-btn")
+  if(!btn) return
+  document.querySelectorAll(".svc-btn").forEach(b=>b.classList.remove("active"))
+  btn.classList.add("active")
+  selSvc = btn.dataset.svc
+})
+
+// Urgencia
+document.querySelectorAll(".urg-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".urg-btn").forEach(b=>
+      b.classList.remove("active-1","active-2","active-3"))
+    selUrg = +btn.dataset.urg
+    btn.classList.add(`active-${selUrg}`)
+  })
+})
+
+// Enter = registrar
+document.getElementById("inp-nombre").addEventListener("keydown",e=>{
+  if(e.key==="Enter") accion.nuevoTurno()
+})
+
+// ══════════════════════════════════════════════
+//  VISTA — renderizado
+// ══════════════════════════════════════════════
+
+const URG_LABELS = {1:"🔴 Urgente", 2:"🟡 Normal", 3:"🟢 Sin apuro"}
+const URG_CLASS  = {1:"tag-urg-1", 2:"tag-urg-2", 3:"tag-urg-3"}
+const SVC_ICONS  = {Pantalla:"🖥️",Batería:"🔋",Software:"⚙️",Cámara:"📷",Carga:"🔌",Otro:"🔧"}
+
+function escHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+}
+
+function renderQueue(){
+  const turnos = cola.turnosEnEspera()
+  const n = turnos.length
+  document.getElementById("count-espera").textContent = n
+  document.getElementById("h-espera").textContent = n
+  document.getElementById("strat-label").textContent = "Modo: " + cola.estrategiaActual()
+
+  const body = document.getElementById("queue-body")
+  const empty = document.getElementById("empty-queue")
+
+  if(n===0){
+    body.innerHTML = ""
+    body.appendChild(empty)
+    empty.style.display = "flex"
+    return
+  }
+  empty.style.display = "none"
+
+  body.innerHTML = turnos.map(t=>`
+    <div class="turn-card" id="card-${t.numero}">
+      <div>
+        <div class="card-num">${t.numero}</div>
+        <div class="card-num-lbl">turno</div>
+      </div>
+      <div class="card-info">
+        <div class="card-name">${escHtml(t.nombre)}</div>
+        <div class="card-meta">
+          <span class="tag tag-svc">${SVC_ICONS[t.servicio]??""} ${t.servicio}</span>
+          <span class="tag ${URG_CLASS[t.urgencia]}">${URG_LABELS[t.urgencia]}</span>
+          <span class="card-hora">🕐 ${t.hora}</span>
+        </div>
+      </div>
+      <button class="btn-x" onclick="accion.cancelar(${t.numero})" title="Cancelar turno">✕</button>
+    </div>`).join("")
+}
+
+function renderHist(){
+  const turnos = cola.turnosAtendidos()
+  const n = cola.totalAtendidos()
+  document.getElementById("count-atend").textContent = n
+  document.getElementById("h-atendidos").textContent = n
+
+  const body = document.getElementById("hist-body")
+  const empty = document.getElementById("empty-hist")
+
+  if(n===0){
+    body.innerHTML = ""
+    body.appendChild(empty)
+    empty.style.display = "flex"
+    return
+  }
+  empty.style.display = "none"
+
+  body.innerHTML = turnos.map(t=>`
+    <div class="hist-card">
+      <div>
+        <div class="card-num">${t.numero}</div>
+        <div class="card-num-lbl">listo</div>
+      </div>
+      <div class="card-info">
+        <div class="card-name" style="font-size:13px">${escHtml(t.nombre)}</div>
+        <div class="card-meta">
+          <span class="tag tag-svc">${SVC_ICONS[t.servicio]??""} ${t.servicio}</span>
+        </div>
+      </div>
+      <div class="hist-done">
+        <span class="hist-done-badge">✓ Atendido</span>
+        <span class="hist-time">${t.horaAtencion}</span>
+      </div>
+    </div>`).join("")
+}
+
+function renderStratBtns(){
+  const actual = cola.estrategiaActual()
+  document.querySelectorAll(".strat-btn").forEach(btn=>{
+    const map = {
+      fifo:"Por orden de llegada",
+      prioridad:"Por urgencia",
+      categoria:"Por tipo de servicio"
+    }
+    btn.classList.toggle("active", map[btn.dataset.strat]===actual)
+  })
+}
+
+function render(){
+  renderQueue()
+  renderHist()
+  renderStratBtns()
+}
+
+// Toast
+function toast(msg, tipo="ok"){
+  const el = document.createElement("div")
+  el.className = `toast ${tipo}`
+  el.textContent = msg
+  document.getElementById("toasts").appendChild(el)
+  setTimeout(()=>el.remove(), 2800)
+}
+
+// ══════════════════════════════════════════════
+//  CONTROLADOR — acciones del usuario
+// ══════════════════════════════════════════════
+
+const accion = {
+  nuevoTurno(){
+    const nombre = document.getElementById("inp-nombre").value
+    try{
+      const t = cola.agregarTurno(nombre, selSvc, selUrg)
+      document.getElementById("inp-nombre").value = ""
+      render()
+      toast(`Turno #${t.numero} registrado — ${t.nombre}`)
+    }catch(e){
+      toast(e.message,"err")
+    }
+  },
+
+  atenderSiguiente(){
+    const t = cola.atenderSiguiente()
+    if(!t){ toast("No hay turnos en espera","warn"); return }
+    render()
+    toast(`Llamando turno #${t.numero} · ${t.nombre}`)
+  },
+
+  cancelar(n){
+    if(cola.cancelarTurno(n)){
+      render()
+      toast(`Turno #${n} cancelado`,"warn")
+    }
+  },
+
+  cambiarEstrategia(clave){
+    const mapa = {
+      fifo:      new EstrategiaFIFO(),
+      prioridad: new EstrategiaUrgencia(),
+      categoria: new EstrategiaServicio(),
+    }
+    cola.cambiarEstrategia(mapa[clave])
+    render()
+    toast(`Modo: ${cola.estrategiaActual()}`)
+  }
+}
+
+// Arranque
+render()
+</script>
+</body>
+</html>
