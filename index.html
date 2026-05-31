@@ -655,73 +655,103 @@ function escHtml(s){
 function renderQueue(){
   const turnos = cola.turnosEnEspera()
   const n = turnos.length
+
   document.getElementById("count-espera").textContent = n
   document.getElementById("h-espera").textContent = n
-  document.getElementById("strat-label").textContent = "Modo: " + cola.estrategiaActual()
+  document.getElementById("strat-label").textContent =
+    "Modo: " + cola.estrategiaActual()
 
   const body = document.getElementById("queue-body")
-  const empty = document.getElementById("empty-queue")
 
-  if(n===0){
-    body.innerHTML = ""
-    body.appendChild(empty)
-    empty.style.display = "flex"
+  if(n === 0){
+    body.innerHTML = `
+      <div class="empty" id="empty-queue">
+        <div class="empty-emoji">📭</div>
+        <div class="empty-txt">Sin turnos en espera</div>
+      </div>
+    `
     return
   }
-  empty.style.display = "none"
 
-  body.innerHTML = turnos.map(t=>`
+  body.innerHTML = turnos.map(t => `
     <div class="turn-card" id="card-${t.numero}">
       <div>
         <div class="card-num">${t.numero}</div>
         <div class="card-num-lbl">turno</div>
       </div>
+
       <div class="card-info">
         <div class="card-name">${escHtml(t.nombre)}</div>
+
         <div class="card-meta">
-          <span class="tag tag-svc">${SVC_ICONS[t.servicio]??""} ${t.servicio}</span>
-          <span class="tag ${URG_CLASS[t.urgencia]}">${URG_LABELS[t.urgencia]}</span>
-          <span class="card-hora">🕐 ${t.hora}</span>
+          <span class="tag tag-svc">
+            ${SVC_ICONS[t.servicio] ?? ""} ${t.servicio}
+          </span>
+
+          <span class="tag ${URG_CLASS[t.urgencia]}">
+            ${URG_LABELS[t.urgencia]}
+          </span>
+
+          <span class="card-hora">
+            🕐 ${t.hora}
+          </span>
         </div>
       </div>
-      <button class="btn-x" onclick="accion.cancelar(${t.numero})" title="Cancelar turno">✕</button>
-    </div>`).join("")
+
+      <button
+        class="btn-x"
+        onclick="accion.cancelar(${t.numero})"
+        title="Cancelar turno">
+        ✕
+      </button>
+    </div>
+  `).join("")
 }
 
 function renderHist(){
   const turnos = cola.turnosAtendidos()
   const n = cola.totalAtendidos()
+
   document.getElementById("count-atend").textContent = n
   document.getElementById("h-atendidos").textContent = n
 
   const body = document.getElementById("hist-body")
-  const empty = document.getElementById("empty-hist")
 
-  if(n===0){
-    body.innerHTML = ""
-    body.appendChild(empty)
-    empty.style.display = "flex"
+  if(n === 0){
+    body.innerHTML = `
+      <div class="empty" id="empty-hist">
+        <div class="empty-emoji">✅</div>
+        <div class="empty-txt">Aún no se atendió ningún turno</div>
+      </div>
+    `
     return
   }
-  empty.style.display = "none"
 
-  body.innerHTML = turnos.map(t=>`
+  body.innerHTML = turnos.map(t => `
     <div class="hist-card">
       <div>
         <div class="card-num">${t.numero}</div>
         <div class="card-num-lbl">listo</div>
       </div>
+
       <div class="card-info">
-        <div class="card-name" style="font-size:13px">${escHtml(t.nombre)}</div>
+        <div class="card-name" style="font-size:13px">
+          ${escHtml(t.nombre)}
+        </div>
+
         <div class="card-meta">
-          <span class="tag tag-svc">${SVC_ICONS[t.servicio]??""} ${t.servicio}</span>
+          <span class="tag tag-svc">
+            ${SVC_ICONS[t.servicio] ?? ""} ${t.servicio}
+          </span>
         </div>
       </div>
+
       <div class="hist-done">
         <span class="hist-done-badge">✓ Atendido</span>
         <span class="hist-time">${t.horaAtencion}</span>
       </div>
-    </div>`).join("")
+    </div>
+  `).join("")
 }
 
 function renderStratBtns(){
