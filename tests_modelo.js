@@ -4,7 +4,7 @@
 //  Sin dependencias externas. Sin npm install.
 //
 //  Ejecutar: node --test tests_modelo.js
-// ============================================================
+// ============================================ddd================
 
 const { test, describe, beforeEach } = require("node:test");
 const assert = require("node:assert/strict");
