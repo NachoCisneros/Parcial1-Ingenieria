@@ -653,8 +653,35 @@ function escHtml(s){
 }
 
 function renderQueue(){
-  const turnos = cola.turnosEnEspera()
-  const n = turnos.length
+  let turnos = cola.turnosEnEspera()
+
+ const estrategia = cola.estrategiaActual()
+
+if (estrategia === "Por urgencia") {
+  turnos = [...turnos].sort((a, b) => {
+    if (a.urgencia !== b.urgencia) {
+      return a.urgencia - b.urgencia
+    }
+    return a.numero - b.numero
+  })
+}
+
+if (estrategia === "Por tipo de servicio") {
+  const orden = ["Pantalla","Batería","Carga","Cámara","Software","Otro"]
+
+  turnos = [...turnos].sort((a, b) => {
+    const ia = orden.indexOf(a.servicio)
+    const ib = orden.indexOf(b.servicio)
+
+    if (ia !== ib) {
+      return ia - ib
+    }
+
+    return a.numero - b.numero
+  })
+}
+
+const n = turnos.length
 
   document.getElementById("count-espera").textContent = n
   document.getElementById("h-espera").textContent = n
